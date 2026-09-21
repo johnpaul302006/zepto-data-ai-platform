@@ -183,3 +183,13 @@ Make sure the project virtual environment is activated.
 
 ```bash
 python data_pipeline/scraper.py
+## 13. Validation Summary
+
+The completed pipeline was tested end to end.
+
+- 100 books were scraped successfully.
+- 29 categories were identified.
+- Cleaned columns have the required data types.
+- The SQLite database contains 100 books and 29 categories.
+- Six SQL queries were executed successfully.
+- The SQL JOIN result and the pandas `pd.merge()` result were confirmed to be equivalent.
