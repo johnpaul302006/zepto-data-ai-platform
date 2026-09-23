@@ -1,0 +1,5 @@
+Model_Type,Model,Accuracy,Precision,Recall,F1,AUC,MAE,RMSE,R2,Adjusted_R2
+Classification,Logistic Regression,0.809,0.7833,0.6912,0.7344,0.861,,,,
+Classification,Decision Tree,0.764,0.76,0.5588,0.6441,0.8374,,,,
+Classification,Random Forest,0.8202,0.7812,0.7353,0.7576,0.8179,,,,
+Regression,Linear Regression,,,,,,21.0986,41.7021,0.3482,0.3091
