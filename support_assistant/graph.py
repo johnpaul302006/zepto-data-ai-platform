@@ -1,15 +1,22 @@
+import json
+import json
 import os
-from typing import TypedDict
+from typing import Callable, TypedDict
+
+from pydantic import ValidationError
+
+from pydantic import ValidationError
 
 from langgraph.graph import END, START, StateGraph
 
 try:
     from .prompts import build_prompt
     from .retriever import retrieve_documents
+    from .schemas import SupportResponse
 except ImportError:
     from prompts import build_prompt
     from retriever import retrieve_documents
-
+    from schemas import SupportResponse
 
 # ---------------------------------------------------------
 # Configuration
@@ -32,6 +39,65 @@ POLICY_KEYWORDS = [
 # LangGraph state
 # ---------------------------------------------------------
 class SupportState(TypedDict, total=False):
+    POLICY_KEYWORDS = [
+    "delivery",
+    "return",
+    "refund",
+    "membership",
+    "tracking",
+    "cancel",
+    "gift card",
+    "support hours",
+]
+
+
+def validate_real_llm_response_with_retry(
+    generate_fn,
+    prompt: str,
+    max_retries: int = 2,
+):
+    """
+    Validate optional real-LLM JSON output against SupportResponse.
+
+    Allows the initial attempt plus up to two corrective retries.
+    """
+    last_error = None
+    current_prompt = prompt
+
+    for attempt in range(max_retries + 1):
+        raw_response = generate_fn(current_prompt)
+
+        try:
+            data = json.loads(raw_response)
+            return SupportResponse.model_validate(data)
+
+        except (json.JSONDecodeError, ValidationError) as error:
+            last_error = error
+
+            if attempt == max_retries:
+                break
+
+            current_prompt = (
+                prompt
+                + "\n\nCORRECTION:\n"
+                "Your previous response failed schema validation.\n"
+                "Return ONLY valid JSON with exactly these fields:\n"
+                "answer (string), sources (list of strings), "
+                "confidence (number between 0 and 1).\n"
+                f"Validation error: {error}"
+            )
+
+    raise ValueError(
+        f"LLM response failed validation after {max_retries + 1} attempts: "
+        f"{last_error}"
+    )
+
+
+# ---------------------------------------------------------
+# LangGraph state
+# ---------------------------------------------------------
+class SupportState(TypedDict, total=False):
+
     query: str
     intent: str
     retrieved: list[dict]
