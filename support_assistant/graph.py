@@ -1,12 +1,8 @@
 import json
-import json
 import os
 from typing import Callable, TypedDict
 
 from pydantic import ValidationError
-
-from pydantic import ValidationError
-
 from langgraph.graph import END, START, StateGraph
 
 try:
@@ -17,6 +13,7 @@ except ImportError:
     from prompts import build_prompt
     from retriever import retrieve_documents
     from schemas import SupportResponse
+
 
 # ---------------------------------------------------------
 # Configuration
@@ -39,23 +36,20 @@ POLICY_KEYWORDS = [
 # LangGraph state
 # ---------------------------------------------------------
 class SupportState(TypedDict, total=False):
-    POLICY_KEYWORDS = [
-    "delivery",
-    "return",
-    "refund",
-    "membership",
-    "tracking",
-    "cancel",
-    "gift card",
-    "support hours",
-]
+    query: str
+    intent: str
+    retrieved: list[dict]
+    answer: str
 
 
+# ---------------------------------------------------------
+# Optional real-LLM response validation with retries
+# ---------------------------------------------------------
 def validate_real_llm_response_with_retry(
-    generate_fn,
+    generate_fn: Callable[[str], str],
     prompt: str,
     max_retries: int = 2,
-):
+) -> SupportResponse:
     """
     Validate optional real-LLM JSON output against SupportResponse.
 
@@ -88,20 +82,9 @@ def validate_real_llm_response_with_retry(
             )
 
     raise ValueError(
-        f"LLM response failed validation after {max_retries + 1} attempts: "
-        f"{last_error}"
+        f"LLM response failed validation after "
+        f"{max_retries + 1} attempts: {last_error}"
     )
-
-
-# ---------------------------------------------------------
-# LangGraph state
-# ---------------------------------------------------------
-class SupportState(TypedDict, total=False):
-
-    query: str
-    intent: str
-    retrieved: list[dict]
-    answer: str
 
 
 # ---------------------------------------------------------
@@ -110,7 +93,6 @@ class SupportState(TypedDict, total=False):
 def classify_intent(state: SupportState) -> SupportState:
     query = state["query"].lower()
 
-    # Required graded mock mode
     if MOCK_LLM:
         intent = (
             "policy_question"
@@ -138,7 +120,7 @@ def classify_intent(state: SupportState) -> SupportState:
 def retrieve_and_answer(state: SupportState) -> SupportState:
     query = state["query"]
 
-    # Retrieval always happens for policy questions.
+    # Retrieval always runs for policy questions.
     retrieved = retrieve_documents(query, top_k=3)
 
     if not retrieved:
@@ -148,7 +130,6 @@ def retrieve_and_answer(state: SupportState) -> SupportState:
             "answer": "No relevant policy context was found.",
         }
 
-    # Required mock-mode answer
     if MOCK_LLM:
         top_chunk = retrieved[0]["document"]
         snippet = top_chunk[:200].strip()
@@ -156,8 +137,6 @@ def retrieve_and_answer(state: SupportState) -> SupportState:
         answer = f"Based on the retrieved context: {snippet}"
 
     else:
-        # Optional real-LLM extension.
-        # For the graded baseline this branch is not used.
         context = "\n\n".join(
             item["document"]
             for item in retrieved
@@ -168,11 +147,10 @@ def retrieve_and_answer(state: SupportState) -> SupportState:
             context=context,
         )
 
-        # Placeholder for the optional real-LLM integration.
-        # The required submission operates entirely through MOCK_LLM=1.
+        # Real-LLM integration is optional and ungraded.
         answer = (
-            "Real-LLM mode is optional and not enabled in the graded "
-            "offline configuration.\n\n"
+            "Real-LLM mode is optional and not enabled in the "
+            "graded offline configuration.\n\n"
             f"Prompt prepared:\n{prompt}"
         )
 
@@ -188,9 +166,10 @@ def retrieve_and_answer(state: SupportState) -> SupportState:
 # ---------------------------------------------------------
 def direct_answer(state: SupportState) -> SupportState:
     if MOCK_LLM:
-        answer = "I can only answer questions about Zepto policies right now."
+        answer = (
+            "I can only answer questions about Zepto policies right now."
+        )
     else:
-        # Optional real-LLM extension.
         answer = "Real-LLM direct answering is optional."
 
     return {
@@ -236,7 +215,7 @@ graph = builder.compile()
 
 
 # ---------------------------------------------------------
-# Simple local test
+# Local verification
 # ---------------------------------------------------------
 if __name__ == "__main__":
     policy_query = "How long does Zepto delivery take?"

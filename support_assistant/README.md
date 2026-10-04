@@ -2,19 +2,22 @@
 
 ## Overview
 
-The Zepto Support Assistant is a Retrieval-Augmented Generation (RAG)
-service that answers questions about Zepto policies using a local
-document corpus, local embeddings, ChromaDB, LangGraph, Pydantic, and
-FastAPI.
+The Zepto Support Assistant is a policy-focused Retrieval-Augmented Generation (RAG) service.
 
-The graded configuration uses offline mock mode by default. This means
-the required workflow does not need an external LLM API key.
+It uses:
+
+- Local policy documents
+- `all-MiniLM-L6-v2` for embeddings
+- ChromaDB for vector storage
+- LangGraph for workflow orchestration
+- Pydantic for structured responses
+- FastAPI for the API
+
+The graded configuration uses deterministic offline mock mode by default, so no external LLM API key is required.
 
 ---
 
-## RAG Architecture
-
-The complete RAG pipeline is:
+## Architecture
 
 ```text
 Zepto Policy Documents
@@ -22,42 +25,38 @@ Zepto Policy Documents
         v
 Ingestion and Chunking
         |
-        |  ingest.py
         v
-Embedding
+Local Embeddings
 all-MiniLM-L6-v2
         |
         v
 ChromaDB
-zepto_policies
         |
-        |
+        v
 User Query
         |
         v
 LangGraph
-classify_intent
         |
-        +--------------------------+
-        |                          |
-        v                          v
-policy_question            general_question
-        |                          |
-        v                          v
-retrieve_and_answer          direct_answer
-        |
-        v
-Top-3 ChromaDB Retrieval
+        +-----------------------+
+        |                       |
+        v                       v
+classify_intent          general_question
+        |                       |
+        v                       v
+policy_question          direct_answer
         |
         v
-Mock/LLM Generation
+retrieve_and_answer
         |
-        +--------------------------+
-                                   |
-                                   v
-                         Pydantic Response
-                     answer / sources / confidence
-                                   |
-                                   v
-                              FastAPI
-                             POST /ask
+        v
+Top-3 Retrieval
+        |
+        v
+Mock/Optional LLM
+        |
+        v
+Pydantic Validation
+        |
+        v
+FastAPI POST /ask

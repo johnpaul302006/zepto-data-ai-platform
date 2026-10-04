@@ -6,11 +6,11 @@ An end-to-end AI/ML engineering capstone project containing three connected modu
 2. Analytics and Predictive Modeling
 3. GenAI Support Assistant
 
-All three modules are maintained in one repository.
+The complete project is maintained in one repository.
 
 ---
 
-# Project Structure
+## Project Structure
 
 ```text
 zepto-data-ai-platform/
@@ -36,7 +36,6 @@ zepto-data-ai-platform/
 │
 ├── support_assistant/
 │   ├── corpus/
-│   ├── chroma_db/
 │   ├── ingest.py
 │   ├── retriever.py
 │   ├── prompts.py
