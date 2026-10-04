@@ -6,7 +6,7 @@ An end-to-end AI/ML engineering capstone project containing three connected modu
 2. Analytics and Predictive Modeling
 3. GenAI Support Assistant
 
-The complete project is maintained in one GitHub repository.
+All three modules are contained in this single public GitHub repository.
 
 ---
 
@@ -18,24 +18,23 @@ zepto-data-ai-platform/
 ├── data_pipeline/
 │   ├── raw_books.csv
 │   ├── cleaned_books.csv
+│   ├── scraper.py
 │   ├── clean_data.py
 │   ├── database.py
-│   ├── pandas_validation.py
 │   ├── queries.py
-│   ├── scraper.py
+│   ├── pandas_validation.py
 │   ├── sql_results.txt
 │   ├── pandas_validation.txt
-│   ├── README.md
-│   └── database/
-│       └── books.db
+│   ├── database/
+│   │   └── books.db
+│   └── README.md
 │
 ├── analytics/
 │   ├── 01_eda.ipynb
 │   ├── 02_modeling.ipynb
 │   ├── titanic.csv
-│   ├── models/
-│   │   └── best_rf_pipeline.joblib
-│   └── outputs/
+│   └── models/
+│       └── best_rf_pipeline.joblib
 │
 ├── support_assistant/
 │   ├── corpus/
@@ -45,10 +44,9 @@ zepto-data-ai-platform/
 │   ├── graph.py
 │   ├── schemas.py
 │   ├── main.py
-│   ├── requirements.txt
 │   ├── Dockerfile
+│   ├── requirements.txt
 │   └── README.md
 │
-├── .gitignore
 ├── requirements.txt
 └── README.md
