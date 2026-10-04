@@ -6,7 +6,7 @@ An end-to-end AI/ML engineering capstone project containing three connected modu
 2. Analytics and Predictive Modeling
 3. GenAI Support Assistant
 
-The complete project is maintained in one repository.
+The complete project is maintained in one GitHub repository.
 
 ---
 
@@ -23,8 +23,11 @@ zepto-data-ai-platform/
 │   ├── pandas_validation.py
 │   ├── queries.py
 │   ├── scraper.py
+│   ├── sql_results.txt
+│   ├── pandas_validation.txt
 │   ├── README.md
 │   └── database/
+│       └── books.db
 │
 ├── analytics/
 │   ├── 01_eda.ipynb
