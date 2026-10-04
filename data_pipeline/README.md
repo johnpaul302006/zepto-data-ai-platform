@@ -1,14 +1,11 @@
+@'
 # Data Pipeline
 
-## 1. Overview
+## Overview
 
-This module implements an end-to-end data pipeline for scraping book
-catalogue data from Books to Scrape, cleaning and transforming the
-data, converting GBP prices to INR using the required fixed project
-rate, storing the cleaned data in a normalized SQLite database,
-running SQL queries, and validating SQL results using pandas.
+This module implements an end-to-end data pipeline using the Books to Scrape catalogue.
 
-## 2. Pipeline Flow
+The pipeline performs:
 
 ```text
 Books to Scrape
@@ -19,7 +16,7 @@ Raw CSV
       ↓
 Data Cleaning
       ↓
-GBP to INR Conversion
+GBP → INR Conversion
       ↓
 SQLite Database
       ↓
