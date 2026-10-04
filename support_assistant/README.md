@@ -4,59 +4,60 @@
 
 The Zepto Support Assistant is a policy-focused Retrieval-Augmented Generation (RAG) service.
 
-It uses:
+The graded baseline uses deterministic offline `MOCK_LLM` mode, so no external LLM API key is required.
 
-- Local policy documents
-- `all-MiniLM-L6-v2` for embeddings
-- ChromaDB for vector storage
-- LangGraph for workflow orchestration
-- Pydantic for structured responses
-- FastAPI for the API
+Technologies used:
 
-The graded configuration uses deterministic offline mock mode by default, so no external LLM API key is required.
+- Python
+- Sentence Transformers
+- ChromaDB
+- LangGraph
+- Pydantic
+- FastAPI
+- Uvicorn
+- Docker
 
----
-
-## Architecture
+## RAG Architecture
 
 ```text
 Zepto Policy Documents
         |
         v
-Ingestion and Chunking
+ingest.py
+Read documents and create chunks
         |
         v
-Local Embeddings
 all-MiniLM-L6-v2
+Generate embeddings
         |
         v
 ChromaDB
+Store embeddings and documents
         |
         v
 User Query
         |
         v
-LangGraph
+graph.py
+classify_intent
         |
-        +-----------------------+
-        |                       |
-        v                       v
-classify_intent          general_question
-        |                       |
-        v                       v
-policy_question          direct_answer
-        |
-        v
-retrieve_and_answer
+        +-----------------------------+
+        |                             |
+        v                             v
+policy_question                 general_question
+        |                             |
+        v                             v
+retrieve_and_answer              direct_answer
         |
         v
-Top-3 Retrieval
+retriever.py
+Top-3 cosine-similarity retrieval
         |
         v
-Mock/Optional LLM
+Mock / Optional LLM generation
         |
         v
-Pydantic Validation
+Pydantic SupportResponse
         |
         v
 FastAPI POST /ask
